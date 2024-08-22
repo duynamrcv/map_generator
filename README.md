@@ -3,6 +3,12 @@ This repository provides the point cloud map generation for various planing meth
 
 ## Installation
 ### Prerequisites
+Install clang-format
+```
+sudo apt install clang-format-10
+sudo ln -s /usr/bin/clang-format-10 /usr/local/bin/clang-format
+```
+Install needed library
 ```
 sudo apt install ros-noetic-pcl
 ```

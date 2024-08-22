@@ -1,18 +1,18 @@
-#include <iostream>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <iostream>
 
-#include <Eigen/Eigen>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Vector3.h>
 #include <math.h>
 #include <nav_msgs/Odometry.h>
-#include <random>
 #include <ros/console.h>
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <Eigen/Eigen>
+#include <random>
 
 using namespace std;
 
@@ -39,7 +39,7 @@ double _x_size, _y_size, _z_size;
 double _x_l, _x_h, _y_l, _y_h, _w_l, _w_h, _h_l, _h_h;
 double _z_limit, _sensing_range, _resolution, _sense_rate, _init_x, _init_y;
 
-bool _map_ok = false;
+bool _map_ok   = false;
 bool _has_odom = false;
 
 int circle_num_;
@@ -56,9 +56,8 @@ pcl::PointCloud<pcl::PointXYZ> cloudMap;
 sensor_msgs::PointCloud2 localMap_pcd;
 pcl::PointCloud<pcl::PointXYZ> clicked_cloud_;
 
-void GenerateWall(double x_min, double x_max, double y_min, double y_max,
-                  double z_min, double z_max,
-                  pcl::PointCloud<pcl::PointXYZ> &cloudMap)
+void GenerateWall(double x_min, double x_max, double y_min, double y_max, double z_min,
+                  double z_max, pcl::PointCloud<pcl::PointXYZ> &cloudMap)
 {
     int x_num, y_num, z_num;
     x_num = ceil((x_max - x_min) / _resolution);
@@ -117,13 +116,13 @@ void RandomMapGenerate()
     rand_w = uniform_real_distribution<double>(_w_l, _w_h);
     rand_h = uniform_real_distribution<double>(_h_l, _h_h);
 
-    rand_radius_ = uniform_real_distribution<double>(radius_l_, radius_h_);
+    rand_radius_  = uniform_real_distribution<double>(radius_l_, radius_h_);
     rand_radius2_ = uniform_real_distribution<double>(radius_l_, 1.2);
-    rand_theta_ = uniform_real_distribution<double>(-theta_, theta_);
-    rand_z_ = uniform_real_distribution<double>(z_l_, z_h_);
+    rand_theta_   = uniform_real_distribution<double>(-theta_, theta_);
+    rand_z_       = uniform_real_distribution<double>(z_l_, z_h_);
 
     // generate polar obs
-    for (int i = 0; i < _obs_num; i++) 
+    for (int i = 0; i < _obs_num; i++)
     {
         double x, y, w, h;
         x = rand_x(eng);
@@ -150,11 +149,11 @@ void RandomMapGenerate()
 
         for (int r = -widNum / 2.0; r < widNum / 2.0; r++)
         {
-            for (int s = -widNum / 2.0; s < widNum / 2.0; s++) 
+            for (int s = -widNum / 2.0; s < widNum / 2.0; s++)
             {
-                h = rand_h(eng);
+                h          = rand_h(eng);
                 int heiNum = ceil(h / _resolution);
-                for (int t = -30; t < heiNum; t++) 
+                for (int t = -30; t < heiNum; t++)
                 {
                     pt_random.x = x + (r + 0.5) * _resolution + 1e-2;
                     pt_random.y = y + (s + 0.5) * _resolution + 1e-2;
@@ -162,12 +161,11 @@ void RandomMapGenerate()
                     cloudMap.points.push_back(pt_random);
                 }
             }
-
         }
     }
 
     // generate circle obs
-    for (int i = 0; i < circle_num_; ++i) 
+    for (int i = 0; i < circle_num_; ++i)
     {
         double x, y, z;
         x = rand_x(eng);
@@ -194,8 +192,7 @@ void RandomMapGenerate()
 
         double theta = rand_theta_(eng);
         Eigen::Matrix3d rotate;
-        rotate << cos(theta), -sin(theta), 0.0, sin(theta), cos(theta), 0.0, 0, 0,
-            1;
+        rotate << cos(theta), -sin(theta), 0.0, sin(theta), cos(theta), 0.0, 0, 0, 1;
 
         double radius1 = rand_radius_(eng);
         double radius2 = rand_radius2_(eng);
@@ -216,9 +213,9 @@ void RandomMapGenerate()
                 {
                     for (int ifz = -0; ifz <= 0; ++ifz)
                     {
-                        cpt_if = cpt + Eigen::Vector3d(ifx * _resolution, ify * _resolution,
-                                                    ifz * _resolution);
-                        cpt_if = rotate * cpt_if + Eigen::Vector3d(x, y, z);
+                        cpt_if      = cpt + Eigen::Vector3d(ifx * _resolution, ify * _resolution,
+                                                       ifz * _resolution);
+                        cpt_if      = rotate * cpt_if + Eigen::Vector3d(x, y, z);
                         pt_random.x = cpt_if(0);
                         pt_random.y = cpt_if(1);
                         pt_random.z = cpt_if(2);
@@ -229,8 +226,8 @@ void RandomMapGenerate()
         }
     }
 
-    cloudMap.width = cloudMap.points.size();
-    cloudMap.height = 1;
+    cloudMap.width    = cloudMap.points.size();
+    cloudMap.height   = 1;
     cloudMap.is_dense = true;
 
     ROS_WARN("Finished generate random map ");
@@ -261,8 +258,8 @@ void FixMapgenerate()
             break;
         }
     }
-    cloudMap.width = cloudMap.points.size();
-    cloudMap.height = 1;
+    cloudMap.width    = cloudMap.points.size();
+    cloudMap.height   = 1;
     cloudMap.is_dense = true;
 
     ROS_WARN("Finished generate fixed map ");
@@ -273,19 +270,18 @@ void FixMapgenerate()
 
 void rcvOdometryCallbck(const nav_msgs::Odometry odom)
 {
-    if (odom.child_frame_id == "X" || odom.child_frame_id == "O")
-        return;
+    if (odom.child_frame_id == "X" || odom.child_frame_id == "O") return;
     _has_odom = true;
 
     _state = {odom.pose.pose.position.x,
-                odom.pose.pose.position.y,
-                odom.pose.pose.position.z,
-                odom.twist.twist.linear.x,
-                odom.twist.twist.linear.y,
-                odom.twist.twist.linear.z,
-                0.0,
-                0.0,
-                0.0};
+              odom.pose.pose.position.y,
+              odom.pose.pose.position.z,
+              odom.twist.twist.linear.x,
+              odom.twist.twist.linear.y,
+              odom.twist.twist.linear.z,
+              0.0,
+              0.0,
+              0.0};
 }
 
 int i = 0;
@@ -302,8 +298,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "random_map_sensing");
     ros::NodeHandle n("~");
 
-    _all_map_pub =
-        n.advertise<sensor_msgs::PointCloud2>("/map_generator/global_cloud", 1);
+    _all_map_pub = n.advertise<sensor_msgs::PointCloud2>("/map_generator/global_cloud", 1);
 
     _odom_sub = n.subscribe("odometry", 50, rcvOdometryCallbck);
 
