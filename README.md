@@ -10,7 +10,7 @@ sudo ln -s /usr/bin/clang-format-10 /usr/local/bin/clang-format
 ```
 Install needed library
 ```
-sudo apt install ros-noetic-pcl
+sudo apt install ros-humble-pcl-ros
 ```
 ### Setup and build
 ```
@@ -23,7 +23,7 @@ catkin_make
 ## Demo
 ```
 cd <workspace>
-source devel/setup.bash
-roslaunch map_generator single_run_in_sim.launch
+source install/local_setup.bash
+ros2 run map_generator random_forest
 ```
 <img src="data/image.png" alt="" width="100%"/>
