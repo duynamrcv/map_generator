@@ -24,29 +24,28 @@ RandomMapSensing::RandomMapSensing() : Node("random_map_sensing")
 
 void RandomMapSensing::setParameters()
 {
-    initX_ = -19.0;  // init state x
-    initY_ = 0.0;  // init state y
+    initX_ = this->declare_parameter("init_state_x", 0.0);
+    initY_ = this->declare_parameter("init_state_y", 0.0);
 
-    sizeX_ = 40.0;  // map size x
-    sizeY_ = 20.0;  // map size y
-    sizeZ_ = 5.0;   // map size z
+    sizeX_ = this->declare_parameter("map/x_size", 10);
+    sizeY_ = this->declare_parameter("map/y_size", 10);
 
-    obsNum_     = 50;
-    circleNum_  = 40;
-    resolution_ = 0.1;
+    obsNum_     = this->declare_parameter("map/column_num", 10);
+    circleNum_  = this->declare_parameter("map/cricle_num", 10);
+    resolution_ = this->declare_parameter("map/resolution", 0.1);
 
-    wl_ = 0.5;
-    wh_ = 0.7;
-    hl_ = 0.0;
-    hh_ = 8.0;
+    wl_ = this->declare_parameter("obstacle_shape/lower_rad", 0.0);
+    wh_ = this->declare_parameter("obstacle_shape/upper_rad", 0.0);
+    hl_ = this->declare_parameter("obstacle_shape/lower_height", 0.0);
+    hh_ = this->declare_parameter("obstacle_shape/upper_height", 0.0);
 
-    radiusL_ = 0.8;
-    radiusH_ = 0.5;
-    zl_      = 2.7;
-    zh_      = 2.8;
-    theta_   = 0.6;
+    radiusL_ = this->declare_parameter("obstacle_shape/radius_l", 0.0);
+    radiusH_ = this->declare_parameter("obstacle_shape/radius_h", 0.0);
+    zl_      = this->declare_parameter("obstacle_shape/z_l", 2.0);
+    zh_      = this->declare_parameter("obstacle_shape/z_h", 2.0);
+    theta_   = this->declare_parameter("obstacle_shape/theta", 0.0);
 
-    sensingRange_ = 50.0;
+    sensingRange_ = this->declare_parameter("sensing/radius", 10);
 
     xl_ = -sizeX_ / 2.0;
     xh_ = sizeX_ / 2.0;
