@@ -31,6 +31,10 @@ include_directories(
 add_executable(random_forest src/main.cpp src/RandomMapSensing.cpp)
 ament_target_dependencies(random_forest rclcpp std_msgs geometry_msgs pcl_conversions nav_msgs)
 
+install(DIRECTORY launch config
+  DESTINATION share/${PROJECT_NAME}/
+)
+
 install(TARGETS
   random_forest
   DESTINATION lib/${PROJECT_NAME})
