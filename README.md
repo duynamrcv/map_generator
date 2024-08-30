@@ -24,6 +24,6 @@ catkin_make
 ```
 cd <workspace>
 source install/local_setup.bash
-ros2 run map_generator random_forest
+ros2 launch map_generator random_forest.launch.py
 ```
 <img src="doc/sample.png" alt="" width="100%"/>
