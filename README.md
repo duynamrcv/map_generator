@@ -26,4 +26,4 @@ cd <workspace>
 source install/local_setup.bash
 ros2 run map_generator random_forest
 ```
-<img src="data/image.png" alt="" width="100%"/>
+<img src="doc/sample.png" alt="" width="100%"/>

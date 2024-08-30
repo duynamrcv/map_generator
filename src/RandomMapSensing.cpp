@@ -24,30 +24,29 @@ RandomMapSensing::RandomMapSensing() : Node("random_map_sensing")
 
 void RandomMapSensing::setParameters()
 {
-    initX_ = 0.0;  // init state x
+    initX_ = -19.0;  // init state x
     initY_ = 0.0;  // init state y
 
-    sizeX_ = 50.0;  // map size x
-    sizeY_ = 50.0;  // map size y
+    sizeX_ = 40.0;  // map size x
+    sizeY_ = 20.0;  // map size y
     sizeZ_ = 5.0;   // map size z
 
     obsNum_     = 50;
     circleNum_  = 40;
     resolution_ = 0.1;
 
-    wl_ = 0.3;
-    wh_ = 0.8;
-    hl_ = 3.0;
-    hh_ = 7.0;
+    wl_ = 0.5;
+    wh_ = 0.7;
+    hl_ = 0.0;
+    hh_ = 8.0;
 
-    radiusL_ = 7.0;
-    radiusH_ = 7.0;
-    zl_      = 7.0;
-    zh_      = 7.0;
-    theta_   = 7.0;
+    radiusL_ = 0.8;
+    radiusH_ = 0.5;
+    zl_      = 2.7;
+    zh_      = 2.8;
+    theta_   = 0.6;
 
-    sensingRange_ = 10.0;
-    limitZ_       = sizeZ_;
+    sensingRange_ = 50.0;
 
     xl_ = -sizeX_ / 2.0;
     xh_ = sizeX_ / 2.0;
@@ -178,7 +177,7 @@ bool RandomMapSensing::generateRandomMap(pcl::PointCloud<pcl::PointXYZ>& cloudMa
             {
                 h          = randH(eng);
                 int heiNum = ceil(h / resolution_);
-                for (int t = -30; t < heiNum; t++)
+                for (int t = 0; t < heiNum; t++)
                 {
                     ptRandom.x = x + (r + 0.5) * resolution_ + 1e-2;
                     ptRandom.y = y + (s + 0.5) * resolution_ + 1e-2;
