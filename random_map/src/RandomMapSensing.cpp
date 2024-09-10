@@ -12,12 +12,12 @@ RandomMapSensing::RandomMapSensing() : Node("random_map_sensing")
     pcl::PointCloud<pcl::PointXYZ> cloudMap;
 
     generateRandomMap(cloudMap);
-    pcl::toROSMsg(cloudMap, globalMap);
-    globalMap.header.frame_id = "map";
-    globalMap.header.stamp    = this->get_clock()->now();
+    pcl::toROSMsg(cloudMap, globalMap_);
+    globalMap_.header.frame_id = "map";
+    globalMap_.header.stamp    = this->get_clock()->now();
     RCLCPP_INFO(this->get_logger(),
                 "Converted PointCloud2 with frame_id: %s, width: %d, height: %d",
-                globalMap.header.frame_id.c_str(), globalMap.width, globalMap.height);
+                globalMap_.header.frame_id.c_str(), globalMap_.width, globalMap_.height);
 
     timer_ = this->create_wall_timer(500ms, std::bind(&RandomMapSensing::timerCallback, this));
 }
@@ -55,7 +55,7 @@ void RandomMapSensing::setParameters()
 
 void RandomMapSensing::timerCallback()
 {
-    globalMapPublisher_->publish(globalMap);
+    globalMapPublisher_->publish(globalMap_);
 }
 
 void RandomMapSensing::odometryCallback(const nav_msgs::msg::Odometry& msg)

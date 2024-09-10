@@ -40,7 +40,7 @@ private:
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr globalMapPublisher_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomSubscription_;
 
-    sensor_msgs::msg::PointCloud2 globalMap;
+    sensor_msgs::msg::PointCloud2 globalMap_;
 
     bool hasOdom_ = false;
 
