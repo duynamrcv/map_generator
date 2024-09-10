@@ -1,10 +1,10 @@
-#include "map_generator/RandomMapSensing.hpp"
+#include "random_map/RandomMapSensing.hpp"
 
 RandomMapSensing::RandomMapSensing() : Node("random_map_sensing")
 {
     setParameters();
     globalMapPublisher_ =
-        this->create_publisher<sensor_msgs::msg::PointCloud2>("/map_generator/global_cloud", 1);
+        this->create_publisher<sensor_msgs::msg::PointCloud2>("/random_map/global_cloud", 1);
     odomSubscription_ = this->create_subscription<nav_msgs::msg::Odometry>(
         "odometry", 50, std::bind(&RandomMapSensing::odometryCallback, this, _1));
 

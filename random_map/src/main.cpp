@@ -1,5 +1,5 @@
 #include <rclcpp/rclcpp.hpp>
-#include "map_generator/RandomMapSensing.hpp"
+#include "random_map/RandomMapSensing.hpp"
 
 using namespace std::chrono_literals;
 

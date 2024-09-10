@@ -6,7 +6,7 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     # Get the path to the package's share directory
-    package_share_directory = get_package_share_directory("map_generator")
+    package_share_directory = get_package_share_directory("random_map")
 
     # Define the path to the RViz configuration file
     rviz_config_path = os.path.join(package_share_directory, "config", "config.rviz")
@@ -14,7 +14,7 @@ def generate_launch_description():
     return LaunchDescription(
         [
             Node(
-                package="map_generator",
+                package="random_map",
                 executable="random_forest",
                 name="random_forest",
                 parameters=[
