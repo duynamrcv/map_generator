@@ -6,7 +6,7 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     # Get the path to the package's share directory
-    package_share_directory = get_package_share_directory("random_map")
+    package_share_directory = get_package_share_directory("map_manager")
 
     # Define the path to the RViz configuration file
     rviz_config_path = os.path.join(package_share_directory, "config", "config.rviz")
@@ -37,6 +37,11 @@ def generate_launch_description():
                         "sensing/radius": 50,
                     }
                 ],
+            ),
+            Node(
+                package="grid_map",
+                executable="grid_map",
+                name="grid_map",
             ),
             Node(
                 package="rviz2",
