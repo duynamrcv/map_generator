@@ -41,6 +41,7 @@ struct MappingParameters
 
 struct MappingData
 {
+    Eigen::Vector3d odomPos_;
     Eigen::Vector3i localBoundMin_, localBoundMax_;
     std::vector<char> occupancyBuffer_;
 };
@@ -55,6 +56,7 @@ public:
 private:
     void timerCallback();
     void cloudMapCallback(const sensor_msgs::msg::PointCloud2& msg);
+    void odomCallback(const nav_msgs::msg::Odometry& msg);
 
     // occupancy map management
     void resetBuffer();
@@ -71,6 +73,7 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr occupancyMapPublisher_;
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr cloudMapSubscription_;
+    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomSubscription_;
 
     MappingParameters mp_;
     MappingData md_;

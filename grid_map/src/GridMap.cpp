@@ -7,8 +7,10 @@ GridMap::GridMap() : Node("random_map_sensing")
         this->create_publisher<sensor_msgs::msg::PointCloud2>("/grid_map/occupancy", 1);
     cloudMapSubscription_ = this->create_subscription<sensor_msgs::msg::PointCloud2>(
         "/random_map/global_cloud", 1, std::bind(&GridMap::cloudMapCallback, this, _1));
+    odomSubscription_ = this->create_subscription<nav_msgs::msg::Odometry>(
+        "/odom", 1, std::bind(&GridMap::odomCallback, this, _1));
 
-    timer_ = this->create_wall_timer(1000ms, std::bind(&GridMap::timerCallback, this));
+    timer_ = this->create_wall_timer(500ms, std::bind(&GridMap::timerCallback, this));
 }
 
 void GridMap::setParameters()
@@ -17,8 +19,8 @@ void GridMap::setParameters()
     double ySize = this->declare_parameter("grid_map/y_size", 20.0);
     double zSize = this->declare_parameter("grid_map/z_size", 5.0);
 
-    mp_.localUpdateRange_(0) = this->declare_parameter("grid_map/local_update_range_x", 40.0);
-    mp_.localUpdateRange_(1) = this->declare_parameter("grid_map/local_update_range_y", 20.0);
+    mp_.localUpdateRange_(0) = this->declare_parameter("grid_map/local_update_range_x", 4.0);
+    mp_.localUpdateRange_(1) = this->declare_parameter("grid_map/local_update_range_y", 4.0);
     mp_.localUpdateRange_(2) = this->declare_parameter("grid_map/local_update_range_z", 5.0);
 
     mp_.obstaclesInflation_ = this->declare_parameter("grid_map/obstacles_inflation", 0.099);
@@ -76,7 +78,6 @@ void GridMap::resetBuffer(Eigen::Vector3d minPos, Eigen::Vector3d maxPos)
 
 void GridMap::timerCallback()
 {
-    convertToOccupancy();
     occupancyMapPublisher_->publish(occupancyMap_);
 }
 
@@ -86,8 +87,10 @@ void GridMap::cloudMapCallback(const sensor_msgs::msg::PointCloud2& msg)
     pcl::fromROSMsg(msg, latestCloud);
 
     if (latestCloud.points.size() == 0) return;
+    if (std::isnan(md_.odomPos_(0)) || std::isnan(md_.odomPos_(1)) || std::isnan(md_.odomPos_(2)))
+        return;
 
-    this->resetBuffer(-mp_.localUpdateRange_, mp_.localUpdateRange_);
+    this->resetBuffer(md_.odomPos_ - mp_.localUpdateRange_, md_.odomPos_ - mp_.localUpdateRange_);
 
     double minX = mp_.mapMaxBoundary_(0);
     double minY = mp_.mapMaxBoundary_(1);
@@ -109,7 +112,7 @@ void GridMap::cloudMapCallback(const sensor_msgs::msg::PointCloud2& msg)
         p3d(0) = pt.x, p3d(1) = pt.y, p3d(2) = pt.z;
 
         // point inside update range
-        Eigen::Vector3d devi = p3d;
+        Eigen::Vector3d devi = p3d - md_.odomPos_;
         Eigen::Vector3i infPt;
 
         if (fabs(devi(0)) < mp_.localUpdateRange_(0) && fabs(devi(1)) < mp_.localUpdateRange_(1) &&
@@ -117,7 +120,9 @@ void GridMap::cloudMapCallback(const sensor_msgs::msg::PointCloud2& msg)
         {
             // inflate the point
             for (int x = -infStep; x <= infStep; ++x)
+            {
                 for (int y = -infStep; y <= infStep; ++y)
+                {
                     for (int z = -infStepZ; z <= infStepZ; ++z)
                     {
                         p3dInf(0) = pt.x + x * mp_.resolution_;
@@ -140,14 +145,33 @@ void GridMap::cloudMapCallback(const sensor_msgs::msg::PointCloud2& msg)
 
                         md_.occupancyBuffer_[idxInf] = 1;
                     }
+                }
+            }
         }
     }
+
+    minX = std::min(minX, md_.odomPos_(0));
+    minY = std::min(minY, md_.odomPos_(1));
+    minZ = std::min(minZ, md_.odomPos_(2));
+
+    maxX = std::max(maxX, md_.odomPos_(0));
+    maxY = std::max(maxY, md_.odomPos_(1));
+    maxZ = std::max(maxZ, md_.odomPos_(2));
 
     posToIndex(Eigen::Vector3d(maxX, maxY, maxZ), md_.localBoundMax_);
     posToIndex(Eigen::Vector3d(minX, minY, minZ), md_.localBoundMin_);
 
     boundIndex(md_.localBoundMin_);
     boundIndex(md_.localBoundMax_);
+}
+
+void GridMap::odomCallback(const nav_msgs::msg::Odometry& msg)
+{
+    md_.odomPos_(0) = msg.pose.pose.position.x;
+    md_.odomPos_(1) = msg.pose.pose.position.y;
+    md_.odomPos_(2) = msg.pose.pose.position.z;
+
+    convertToOccupancy();
 }
 
 void GridMap::convertToOccupancy()
@@ -173,7 +197,9 @@ void GridMap::convertToOccupancy()
                 if (md_.occupancyBuffer_[toAddress(x, y, z)] == 0) continue;
                 Eigen::Vector3d pos;
                 indexToPos(Eigen::Vector3i(x, y, z), pos);
-                if (pos(2) > mp_.visualizationTruncateHeight_) continue;
+                if (pos(2) > md_.odomPos_(2) + mp_.visualizationTruncateHeight_ ||
+                    pos(2) < md_.odomPos_(2) - mp_.visualizationTruncateHeight_)
+                    continue;
                 pcl::PointXYZ pt;
                 pt.x = pos(0);
                 pt.y = pos(1);
