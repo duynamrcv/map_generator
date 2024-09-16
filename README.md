@@ -26,4 +26,9 @@ cd <workspace>
 source install/local_setup.bash
 ros2 launch map_manager environment.launch.py
 ```
+
+For example, to appear grid map of sensed map at drone position ``[10,0,2]``:
+```
+ros2 topic pub /odom nav_msgs/msg/Odometry "{header: {frame_id: ''}, child_frame_id: '', pose: {pose: {position: {x: 10.0, y: 0.0, z: 2}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}}, twist: {twist: {linear: {x: 0.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}}}"
+```
 <img src="doc/sample.png" alt="" width="100%"/>
