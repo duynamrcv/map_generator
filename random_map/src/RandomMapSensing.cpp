@@ -31,7 +31,7 @@ void RandomMapSensing::setParameters()
     sizeY_ = this->declare_parameter("map/y_size", 10);
 
     obsNum_     = this->declare_parameter("map/column_num", 10);
-    circleNum_  = this->declare_parameter("map/cricle_num", 10);
+    circleNum_  = this->declare_parameter("map/circle_num", 10);
     resolution_ = this->declare_parameter("map/resolution", 0.1);
 
     wl_ = this->declare_parameter("obstacle_shape/lower_rad", 0.0);
