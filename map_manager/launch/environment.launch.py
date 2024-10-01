@@ -17,16 +17,22 @@ def generate_launch_description():
         [
             Node(
                 package="random_map",
-                executable="random_forest",
+                executable="random_forest_node",
                 name="random_forest",
                 parameters=[random_map_config_path],
             ),
             Node(
                 package="grid_map",
-                executable="grid_map",
+                executable="grid_map_node",
                 name="grid_map",
                 parameters=[grid_map_config_path],
             ),
+            # Node(
+            #     package="motion_planning",
+            #     executable="kino_astar",
+            #     name="kino_astar",
+            #     parameters=[grid_map_config_path],
+            # ),
             Node(
                 package="rviz2",
                 executable="rviz2",
