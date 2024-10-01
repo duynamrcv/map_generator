@@ -53,6 +53,10 @@ public:
     void setParameters();
     void convertToOccupancy();
 
+    int getInflateOccupancy(Eigen::Vector3d pos);
+    bool isInMap(const Eigen::Vector3d& idx);
+    bool isInMap(const Eigen::Vector3i& idx);
+
 private:
     void timerCallback();
     void cloudMapCallback(const sensor_msgs::msg::PointCloud2& msg);
@@ -66,10 +70,8 @@ private:
     inline void indexToPos(const Eigen::Vector3i& id, Eigen::Vector3d& pos);
     inline int toAddress(const Eigen::Vector3i& id);
     inline int toAddress(int& x, int& y, int& z);
-    inline bool isInMap(const Eigen::Vector3i& idx);
-
     inline void boundIndex(Eigen::Vector3i& id);
-
+    
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr occupancyMapPublisher_;
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr cloudMapSubscription_;

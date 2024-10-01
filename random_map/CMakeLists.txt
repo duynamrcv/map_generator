@@ -31,11 +31,28 @@ include_directories(
   ${PCL_INCLUDE_DIRS}
 )
 
-add_executable(random_forest src/main.cpp src/RandomMapSensing.cpp)
-ament_target_dependencies(random_forest rclcpp std_msgs geometry_msgs pcl_conversions nav_msgs)
+add_executable(random_forest_node src/main.cpp src/RandomMapSensing.cpp)
+ament_target_dependencies(random_forest_node rclcpp std_msgs geometry_msgs pcl_conversions nav_msgs)
+
+add_library(${PROJECT_NAME} SHARED src/RandomMapSensing.cpp)
+ament_target_dependencies(${PROJECT_NAME} rclcpp geometry_msgs std_msgs pcl_conversions nav_msgs)
+ament_export_libraries(${PROJECT_NAME})
+ament_export_include_directories(include)
+
+install(DIRECTORY
+  include/
+  DESTINATION include
+)
+
+install(
+  TARGETS ${PROJECT_NAME}
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
 install(TARGETS
-  random_forest
+  random_forest_node
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()

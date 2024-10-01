@@ -31,11 +31,28 @@ include_directories(
   ${PCL_INCLUDE_DIRS}
 )
 
-add_executable(grid_map src/main.cpp src/GridMap.cpp src/RayCaster.cpp)
-ament_target_dependencies(grid_map rclcpp geometry_msgs pcl_conversions nav_msgs visualization_msgs)
+add_executable(grid_map_node src/main.cpp src/GridMap.cpp src/RayCaster.cpp)
+ament_target_dependencies(grid_map_node rclcpp geometry_msgs pcl_conversions nav_msgs visualization_msgs)
+
+add_library(${PROJECT_NAME} SHARED src/GridMap.cpp src/RayCaster.cpp)
+ament_target_dependencies(${PROJECT_NAME} rclcpp geometry_msgs pcl_conversions nav_msgs visualization_msgs)
+ament_export_libraries(${PROJECT_NAME})
+ament_export_include_directories(include)
+
+install(DIRECTORY
+  include/
+  DESTINATION include
+)
+
+install(
+  TARGETS ${PROJECT_NAME}
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
 install(TARGETS
-  grid_map
+  grid_map_node
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()

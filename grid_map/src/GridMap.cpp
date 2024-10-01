@@ -241,7 +241,7 @@ inline int GridMap::toAddress(int& x, int& y, int& z)
     return x * mp_.mapVoxelNum_(1) * mp_.mapVoxelNum_(2) + y * mp_.mapVoxelNum_(2) + z;
 }
 
-inline bool GridMap::isInMap(const Eigen::Vector3i& idx)
+bool GridMap::isInMap(const Eigen::Vector3i& idx)
 {
     if (idx(0) < 0 || idx(1) < 0 || idx(2) < 0)
     {
@@ -250,6 +250,23 @@ inline bool GridMap::isInMap(const Eigen::Vector3i& idx)
     if (idx(0) > mp_.mapVoxelNum_(0) - 1 || idx(1) > mp_.mapVoxelNum_(1) - 1 ||
         idx(2) > mp_.mapVoxelNum_(2) - 1)
     {
+        return false;
+    }
+    return true;
+}
+
+bool GridMap::isInMap(const Eigen::Vector3d& pos)
+{
+    if (pos(0) < mp_.mapMinBoundary_(0) + 1e-4 || pos(1) < mp_.mapMinBoundary_(1) + 1e-4 ||
+        pos(2) < mp_.mapMinBoundary_(2) + 1e-4)
+    {
+        // cout << "less than min range!" << endl;
+        return false;
+    }
+    if (pos(0) > mp_.mapMaxBoundary_(0) - 1e-4 || pos(1) > mp_.mapMaxBoundary_(1) - 1e-4 ||
+        pos(2) > mp_.mapMaxBoundary_(2) - 1e-4)
+    {
+        // cout << "greater than max range!" << endl;
         return false;
     }
     return true;
@@ -269,4 +286,14 @@ inline void GridMap::indexToPos(const Eigen::Vector3i& id, Eigen::Vector3d& pos)
     {
         pos(i) = (id(i) + 0.5) * mp_.resolution_ + mp_.mapOrigin_(i);
     }
+}
+
+int GridMap::getInflateOccupancy(Eigen::Vector3d pos)
+{
+    if (!isInMap(pos)) return -1;
+
+    Eigen::Vector3i id;
+    posToIndex(pos, id);
+
+    return int(md_.occupancyBuffer_[toAddress(id)]);
 }

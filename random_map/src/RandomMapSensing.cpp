@@ -6,7 +6,7 @@ RandomMapSensing::RandomMapSensing() : Node("random_map_sensing")
     globalMapPublisher_ =
         this->create_publisher<sensor_msgs::msg::PointCloud2>("/random_map/global_cloud", 1);
     odomSubscription_ = this->create_subscription<nav_msgs::msg::Odometry>(
-        "odometry", 50, std::bind(&RandomMapSensing::odometryCallback, this, _1));
+        "odom", 50, std::bind(&RandomMapSensing::odometryCallback, this, _1));
 
     // generate point cloud data
     pcl::PointCloud<pcl::PointXYZ> cloudMap;
